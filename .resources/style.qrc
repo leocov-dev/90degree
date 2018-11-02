@@ -1,0 +1,12 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="background.png">img/background.png</file>
+    <file alias="close.png">img/close.png</file>
+    <file alias="left.png">img/left.png</file>
+    <file alias="right.png">img/right.png</file>
+    <file alias="title.png">img/title.png</file>
+    <file alias="x.png">img/x.png</file>
+    <file alias="y.png">img/y.png</file>
+    <file alias="z.png">img/z.png</file>
+</qresource>
+</RCC>
