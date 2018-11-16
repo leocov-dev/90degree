@@ -1,5 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
+    <file alias="icon.png">img/icon.png</file>
     <file alias="background.png">img/background.png</file>
     <file alias="close.png">img/close.png</file>
     <file alias="left.png">img/left.png</file>

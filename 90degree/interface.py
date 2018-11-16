@@ -1,8 +1,18 @@
 from __future__ import division
 
-from PySide2 import QtCore, QtGui, QtWidgets
-# noinspection PyUnresolvedReferences
-from rcc_bundles import bundle_pyside2
+try:
+    from PySide2 import QtCore, QtWidgets, QtGui
+except ImportError:
+    from vendor.Qt import QtCore, QtWidgets, QtGui
+
+from vendor import Qt
+
+if Qt.IsPySide:
+    # noinspection PyUnresolvedReferences
+    from rcc_bundles import bundle_pyside
+else:
+    # noinspection PyUnresolvedReferences
+    from rcc_bundles import bundle_pyside2
 
 
 class Window90Degree(QtWidgets.QWidget):
@@ -11,11 +21,15 @@ class Window90Degree(QtWidgets.QWidget):
 
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowIcon(QtGui.QIcon(":/icon.png"))
         self.setMouseTracking(True)
 
+        self._app = QtWidgets.QApplication.instance()
+        self._cursor = QtGui.QCursor()
         self._dpi = self.logicalDpiX() / 96
 
-        print(self._dpi)
+        self._mousePressPos = None
+        self._latch_drag = False
         self._enter_close = False
         self._enter_x_left = False
         self._enter_x_right = False
@@ -112,29 +126,60 @@ class Window90Degree(QtWidgets.QWidget):
         event.accept()
         if event.type() != QtCore.QEvent.MouseButtonPress:
             return
+
         if self.rect_close.contains(event.pos()):
-            if event.button() == QtCore.Qt.LeftButton:
-                self.close()
+            self.color_close = self.color_out_close
+
+        if (self.rect_title.contains(event.pos()) and
+                not self.rect_close.contains(event.pos()) and
+                event.button() == QtCore.Qt.LeftButton):
+            self._latch_drag = True
+        self._mousePressPos = event.pos()
+
+        self.update()
 
     def mouseMoveEvent(self, event):
         # type: (QtCore.QEvent) -> None
         """ mouse movement """
         event.accept()
-        if self.rect_close.contains(event.pos()):
-            if not self._enter_close:
-                self.color_close = self.color_in_close
-                self._enter_close = True
-                print("enter")
+
+        if (self.rect_close.contains(event.pos()) and
+                not self._app.mouseButtons() == QtCore.Qt.LeftButton):
+            self.color_close = self.color_in_close
+            self._enter_close = True
         else:
             self.color_close = self.color_out_close
             self._enter_close = False
 
+        if (self.rect_title.contains(event.pos()) and
+                self._latch_drag and
+                self._app.mouseButtons() == QtCore.Qt.LeftButton):
+            self.move(event.globalPos() - self._mousePressPos)
+
         self.update()
+
+    def mouseReleaseEvent(self, event):
+        self._latch_drag = False
+        if (self.rect_close.contains(event.pos()) and
+                event.button() == QtCore.Qt.LeftButton):
+            event.accept()
+            self.close()
+            return
+        # if self._mousePressPos:
+        #     moved = event.globalPos() - self._mousePressPos
+        #     if moved.manhattanLength() > 3:
+        #         event.ignore()
+        #         return
 
     def leaveEvent(self, event):
         """ mouse exit the window """
+        event.accept()
+
         self.color_close = self.color_out_close
         self._enter_close = False
+
+        if self._latch_drag:
+            self.move(self._cursor.pos() - self._mousePressPos)
 
         self.update()
 
@@ -172,12 +217,6 @@ class Window90Degree(QtWidgets.QWidget):
         self.img_close.setAlphaChannel(self.px_close.toImage())
         painter.drawImage(self.rect_close,
                           self.img_close)
-        # painter.setCompositionMode(QtGui.QPainter.CompositionMode_SourceIn)
-        # painter.drawPixmap(self.rect_close,
-        #                    self.px_close)
-        # painter.setCompositionMode(QtGui.QPainter.CompositionMode_SourceAtop)
-        # painter.fillRect(self.rect_close,
-        #                  self.brush_close)
 
         # left arrows
         painter.drawPixmap(self.rect_left,
