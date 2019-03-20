@@ -2,6 +2,8 @@
 ![tested_maya_2018](https://img.shields.io/badge/maya-2018-128189.svg?style=flat)
 ![license](https://img.shields.io/badge/license-MIT-A31F34.svg?style=flat)
 
+**This project is still a WIP**
+
 ## Description
 
 This Python tool for Maya will let you rotate selected objects by 90 degrees in a positive or negative direction.
