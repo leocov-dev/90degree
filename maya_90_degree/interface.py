@@ -92,10 +92,12 @@ class Window90Degree(QtWidgets.QWidget):
                                         QtCore.QPoint(self.width() // 2, self.rect_left.bottom()))
         self.rect_x_right = QtCore.QRect(QtCore.QPoint(self.width() // 2, self.rect_right.top()),
                                          self.rect_right.bottomRight())
+
         self.rect_y_left = self.rect_x_left.adjusted(0, self.rect_x_left.height(),
                                                      0, self.rect_x_left.height())
         self.rect_y_right = self.rect_x_left.adjusted(0, self.rect_x_right.height(),
                                                       0, self.rect_x_right.height())
+
         self.rect_z_left = self.rect_x_left.adjusted(0, self.rect_x_left.height() * 2,
                                                      0, self.rect_x_left.height() * 2)
         self.rect_z_right = self.rect_x_left.adjusted(0, self.rect_x_right.height() * 2,
@@ -165,11 +167,6 @@ class Window90Degree(QtWidgets.QWidget):
             event.accept()
             self.close()
             return
-        # if self._mousePressPos:
-        #     moved = event.globalPos() - self._mousePressPos
-        #     if moved.manhattanLength() > 3:
-        #         event.ignore()
-        #         return
 
     def leaveEvent(self, event):
         """ mouse exit the window """
@@ -218,37 +215,26 @@ class Window90Degree(QtWidgets.QWidget):
         painter.drawImage(self.rect_close,
                           self.img_close)
 
-        # left arrows
-        painter.drawPixmap(self.rect_left,
-                           self.px_left)
-        painter.drawPixmap(self.rect_left.adjusted(0, self.rect_left.height(),
-                                                   0, self.rect_left.height()),
-                           self.px_left)
-        painter.drawPixmap(self.rect_left.adjusted(0, self.rect_left.height() * 2,
-                                                   0, self.rect_left.height() * 2),
-                           self.px_left)
-
         # X
-        painter.drawPixmap(self.rect_center,
-                           self.px_x)
-        # Y
-        painter.drawPixmap(self.rect_center.adjusted(0, self.rect_center.height(),
-                                                     0, self.rect_center.height()),
-                           self.px_y)
-        # Z
-        painter.drawPixmap(self.rect_center.adjusted(0, self.rect_center.height() * 2,
-                                                     0, self.rect_center.height() * 2),
-                           self.px_z)
+        self.draw_button_row(painter, [(self.rect_left, self.px_left),
+                                       (self.rect_center, self.px_x),
+                                       (self.rect_right, self.px_right)])
 
-        # right arrows
-        painter.drawPixmap(self.rect_right,
-                           self.px_right)
-        painter.drawPixmap(self.rect_right.adjusted(0, self.rect_right.height(),
-                                                    0, self.rect_right.height()),
-                           self.px_right)
-        painter.drawPixmap(self.rect_right.adjusted(0, self.rect_right.height() * 2,
-                                                    0, self.rect_right.height() * 2),
-                           self.px_right)
+        # Y
+        self.draw_button_row(painter, [(self.rect_left, self.px_left),
+                                       (self.rect_center, self.px_y),
+                                       (self.rect_right, self.px_right)], offset=1)
+
+        # Z
+        self.draw_button_row(painter, [(self.rect_left, self.px_left),
+                                       (self.rect_center, self.px_z),
+                                       (self.rect_right, self.px_right)], offset=2)
+
+    @staticmethod
+    def draw_button_row(painter, rect_px_list, offset=0):
+        """ draw a row of buttons """
+        for rect, px in rect_px_list:
+            painter.drawPixmap(rect.adjusted(0, rect.height() * offset, 0, rect.height() * offset), px)
 
 
 def load():
