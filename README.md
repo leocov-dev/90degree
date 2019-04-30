@@ -2,6 +2,8 @@
 ![tested_maya_2018](https://img.shields.io/badge/maya-2018-128189.svg?style=flat)
 ![license](https://img.shields.io/badge/license-MIT-A31F34.svg?style=flat)
 
+**This project is still a WIP**
+
 ## Description
 
 #### Work In Progress
